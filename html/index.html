@@ -1,0 +1,58 @@
+<html>
+<head>
+<title>Buzzer</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
+}
+</style>
+</head>
+<body>
+<img src = "button.png" id = "button">
+</body>
+<script>
+let gameid = false
+if (window.location.hash) {
+  gameid = window.location.hash.substr(1)
+}
+const socket = io()
+
+function failed() {
+  document.body.style.backgroundColor = 'black'
+  setTimeout(() => {
+    document.body.style.backgroundColor = 'white'
+  }, 2000)
+}
+
+function fastest() {
+  let i = 20
+  const interval = setInterval(() => {
+    if (i <= 0) {
+      clearInterval(interval)
+      document.body.style.backgroundColor = 'white'
+      return
+    }
+    document.body.style.backgroundColor = 'rgb(' +
+        Math.round((Math.random() * 235) + 10) + ', ' +
+        Math.round((Math.random() * 235) + 10) + ', ' +
+        Math.round((Math.random() * 235) + 10) + ')'
+    i--
+  }, 200)
+}
+
+socket.on('failed', failed)
+socket.on('fastest', fastest)
+
+document.getElementById('button').onclick = () => {
+  if (!gameid) {
+    console.log('no game selected')
+    return
+  }
+  socket.emit('pressed', { gameid: gameid })
+}
+</script>
